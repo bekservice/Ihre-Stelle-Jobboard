@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'airtable' => [
+        'token' => env('AIRTABLE_API_TOKEN'),
+    ],
+
 ];
