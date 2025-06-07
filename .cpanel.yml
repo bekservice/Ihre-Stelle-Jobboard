@@ -1,8 +1,7 @@
 ---
 deployment:
   tasks:
-    - export PROJECT=/home3/recruiting/jobs.ihre-stelle.de/laravel/ihre-stelle
-    - cd $PROJECT
+    - cd ihre-stelle
     - /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader
     - php artisan config:cache
     - php artisan route:cache
