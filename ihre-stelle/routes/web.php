@@ -9,6 +9,9 @@ Route::get('/', [JobController::class, 'index'])->name('home');
 Route::get('/jobs/{job:slug}', [JobController::class, 'show'])->name('jobs.show');
 Route::get('/jobs', [JobController::class, 'search'])->name('jobs.search');
 
+// Saved jobs API
+Route::post('/api/saved-jobs', [JobController::class, 'getSavedJobs'])->name('api.saved-jobs');
+
 // Legal pages
 Route::view('/impressum', 'legal.impressum')->name('impressum');
 Route::view('/datenschutz', 'legal.datenschutz')->name('datenschutz');

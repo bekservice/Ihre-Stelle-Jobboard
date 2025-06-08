@@ -108,19 +108,31 @@
                     </div>
 
                    <div class="hidden md:flex items-center space-x-8">
-                        <!-- <a href="{{ route('home') }}" class="nav-link px-3 py-2 text-sm font-medium transition-colors">
-                            Home
-                        </a>
                         <a href="{{ route('jobs.search') }}" class="nav-link px-3 py-2 text-sm font-medium transition-colors">
                             Jobs suchen
                         </a>
-                        <a href="#" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">
-                            Job posten
-                        </a> -->
+                        
+                        <!-- Gespeicherte Jobs Icon -->
+                        <button id="saved-jobs-btn" class="relative p-2 text-gray-600 hover:text-primary-orange transition-colors" title="Gespeicherte Jobs">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                            </svg>
+                            <!-- Badge für Anzahl gespeicherter Jobs -->
+                            <span id="saved-jobs-count" class="absolute -top-1 -right-1 bg-primary-orange text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                        </button>
                     </div>
 
                     <!-- Mobile menu button -->
-                    <div class="md:hidden flex items-center">
+                    <div class="md:hidden flex items-center space-x-2">
+                        <!-- Gespeicherte Jobs Icon Mobile -->
+                        <button id="saved-jobs-btn-mobile" class="relative p-2 text-gray-600 hover:text-primary-orange transition-colors" title="Gespeicherte Jobs">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                            </svg>
+                            <!-- Badge für Anzahl gespeicherter Jobs -->
+                            <span id="saved-jobs-count-mobile" class="absolute -top-1 -right-1 bg-primary-orange text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                        </button>
+                        
                         <button type="button" class="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600" id="mobile-menu-button">
                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -252,6 +264,387 @@
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
         });
+
+        // Gespeicherte Jobs Funktionalität
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSavedJobsCount();
+            
+            // Event Listeners für beide Buttons (Desktop und Mobile)
+            const savedJobsButtons = document.querySelectorAll('#saved-jobs-btn, #saved-jobs-btn-mobile');
+            savedJobsButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    showSavedJobsModal();
+                });
+            });
+        });
+
+        function updateSavedJobsCount() {
+            const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+            const count = savedJobs.length;
+            
+            const countElements = document.querySelectorAll('#saved-jobs-count, #saved-jobs-count-mobile');
+            countElements.forEach(element => {
+                element.textContent = count;
+                if (count > 0) {
+                    element.classList.remove('hidden');
+                } else {
+                    element.classList.add('hidden');
+                }
+            });
+        }
+
+        function showSavedJobsModal() {
+            const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+            
+            if (savedJobs.length === 0) {
+                showNotification('Keine gespeicherten Jobs vorhanden', 'info');
+                return;
+            }
+
+            // Fetch job details for saved jobs
+            fetchSavedJobDetails(savedJobs);
+        }
+
+        function fetchSavedJobDetails(jobIds) {
+            // Create modal with loading state
+            const modal = document.createElement('div');
+            modal.className = 'saved-jobs-modal';
+            modal.innerHTML = `
+                <div class="saved-jobs-modal-content">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">Gespeicherte Jobs (${jobIds.length})</h3>
+                        <button id="close-saved-jobs-modal" class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div id="saved-jobs-list" class="space-y-4">
+                        <div class="text-center py-8">
+                            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-orange mx-auto"></div>
+                            <p class="text-gray-600 mt-3 font-medium">Lade gespeicherte Jobs...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-4 border-t border-gray-200 flex justify-between items-center">
+                        <button onclick="clearAllSavedJobs()" class="text-red-600 hover:text-red-800 text-sm font-medium hover:bg-red-50 px-3 py-2 rounded-lg transition-colors">
+                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Alle löschen
+                        </button>
+                        <a href="/jobs" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">
+                            Weitere Jobs finden
+                        </a>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Modal schließen
+            document.getElementById('close-saved-jobs-modal').addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+            
+            // Modal schließen bei Klick außerhalb
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+
+            // Fetch real job data from server
+            fetch('/api/saved-jobs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ job_ids: jobIds })
+            })
+            .then(response => response.json())
+            .then(jobs => {
+                displaySavedJobs(jobs, jobIds);
+            })
+            .catch(error => {
+                console.error('Error fetching saved jobs:', error);
+                displaySavedJobsError();
+            });
+        }
+
+        function displaySavedJobs(jobs, originalJobIds) {
+            const listContainer = document.getElementById('saved-jobs-list');
+            
+            if (jobs.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-8">
+                        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                        </svg>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">Keine aktiven Jobs gefunden</h4>
+                        <p class="text-gray-600 mb-4">Die gespeicherten Jobs sind möglicherweise nicht mehr verfügbar.</p>
+                        <button onclick="clearAllSavedJobs()" class="btn-outline px-4 py-2 rounded-lg text-sm font-medium">
+                            Gespeicherte Jobs bereinigen
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            listContainer.innerHTML = jobs.map(job => `
+                <div class="saved-job-item bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg hover:border-primary-orange/30 transition-all duration-200">
+                    <div class="flex items-start gap-4">
+                        ${job.logo_url ? `
+                            <div class="flex-shrink-0">
+                                <img src="${job.logo_url}" alt="Logo" class="w-12 h-12 rounded-lg object-cover border border-gray-200">
+                            </div>
+                        ` : `
+                            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary-orange to-accent-orange rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
+                                </svg>
+                            </div>
+                        `}
+                        
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-semibold text-gray-900 mb-2 text-lg leading-tight">
+                                <a href="${job.url}" class="hover:text-primary-orange transition-colors line-clamp-2">
+                                    ${job.title}
+                                </a>
+                            </h4>
+                            
+                            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
+                                ${job.company ? `
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                        </svg>
+                                        <span class="font-medium">${job.company}</span>
+                                    </div>
+                                ` : ''}
+                                
+                                ${job.location ? `
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <span>${job.location}</span>
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>${job.created_at}</span>
+                                </div>
+                            </div>
+                            
+                            ${job.category ? `
+                                <div class="mb-3">
+                                    <span class="inline-block bg-primary-orange/10 text-primary-orange text-xs font-medium px-2.5 py-1 rounded-full">
+                                        ${job.category}
+                                    </span>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="flex items-center gap-3">
+                                <a href="${job.url}" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">
+                                    Details ansehen
+                                </a>
+                                <button onclick="removeSavedJob('${job.id}')" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Aus gespeicherten Jobs entfernen">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displaySavedJobsError() {
+            const listContainer = document.getElementById('saved-jobs-list');
+            listContainer.innerHTML = `
+                <div class="text-center py-8">
+                    <svg class="w-16 h-16 text-red-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    <h4 class="text-lg font-medium text-gray-900 mb-2">Fehler beim Laden</h4>
+                    <p class="text-gray-600 mb-4">Die gespeicherten Jobs konnten nicht geladen werden.</p>
+                    <button onclick="location.reload()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">
+                        Erneut versuchen
+                    </button>
+                </div>
+            `;
+        }
+
+        function removeSavedJob(jobId) {
+            let savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+            savedJobs = savedJobs.filter(id => id !== jobId);
+            localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+            
+            updateSavedJobsCount();
+            
+            // Remove from modal if open
+            const jobItem = document.querySelector(`[onclick="removeSavedJob('${jobId}')"]`)?.closest('.saved-job-item');
+            if (jobItem) {
+                jobItem.remove();
+            }
+            
+            // Update modal title
+            const modalTitle = document.querySelector('.saved-jobs-modal h3');
+            if (modalTitle) {
+                modalTitle.textContent = `Gespeicherte Jobs (${savedJobs.length})`;
+            }
+            
+            // Close modal if no jobs left
+            if (savedJobs.length === 0) {
+                const modal = document.querySelector('.saved-jobs-modal');
+                if (modal) {
+                    document.body.removeChild(modal);
+                }
+                showNotification('Alle gespeicherten Jobs entfernt', 'success');
+            } else {
+                showNotification('Job entfernt', 'success');
+            }
+        }
+
+        function clearAllSavedJobs() {
+            if (confirm('Möchten Sie wirklich alle gespeicherten Jobs löschen?')) {
+                localStorage.removeItem('savedJobs');
+                updateSavedJobsCount();
+                
+                const modal = document.querySelector('.saved-jobs-modal');
+                if (modal) {
+                    document.body.removeChild(modal);
+                }
+                
+                showNotification('Alle gespeicherten Jobs gelöscht', 'success');
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Listen for storage changes to update count across tabs
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'savedJobs') {
+                updateSavedJobsCount();
+            }
+        });
     </script>
+
+    <!-- Styles für Gespeicherte Jobs Modal -->
+    <style>
+        .saved-jobs-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .saved-jobs-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 700px;
+            width: 95%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .saved-job-item {
+            transition: all 0.3s ease;
+        }
+
+        .saved-job-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Scrollbar styling */
+        .saved-jobs-modal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .saved-jobs-modal-content::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .saved-jobs-modal-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .saved-jobs-modal-content::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 500;
+            z-index: 1001;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background-color: #10b981;
+        }
+
+        .notification.error {
+            background-color: #ef4444;
+        }
+
+        .notification.info {
+            background-color: #3b82f6;
+        }
+    </style>
 </body>
 </html>
