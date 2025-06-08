@@ -110,7 +110,7 @@ class SyncAirtableJobs extends Command
             'benefits' => $this->processMultipleSelect($fields['Benefits'] ?? null),
             
             // Attachments/Logos
-            'banner_fb' => $this->processAttachments($fields['Banner FB'] ?? null),
+            'banner_fb' => $this->processAttachments($fields['Banner (FB)'] ?? null),
             'job_logo' => $this->processAttachments($fields['Job Logo'] ?? null),
         ]);
 

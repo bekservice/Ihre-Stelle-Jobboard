@@ -89,9 +89,10 @@ class SyncSingleJob extends Command
             'is_active' => $active,
             
             // Arbeitgeber Informationen
-            'arbeitsgeber_name' => $fields['Arbeitsgeber Name'] ?? null,
+            'arbeitsgeber_name' => $fields['Arbeitsgeber name'] ?? null,
             'arbeitsgeber_tel' => $this->processMultipleSelect($fields['Arbeitsgeber Tel'] ?? null),
-            'arbeitsgeber_website' => $this->processMultipleSelect($fields['Arbeitsgeber Website'] ?? null),
+            'arbeitsgeber_website' => $this->processMultipleSelect($fields['Arbeitsgeber website'] ?? null),
+            'arbeitsgeber_final_id' => $this->processLinkedRecord($fields['Arbeitsgeber-Final'] ?? null),
             
             // Job Details
             'grundgehalt' => $fields['Grundgehalt'] ?? null,
@@ -106,7 +107,7 @@ class SyncSingleJob extends Command
             'benefits' => $this->processMultipleSelect($fields['Benefits'] ?? null),
             
             // Attachments/Logos
-            'banner_fb' => $this->processAttachments($fields['Banner FB'] ?? null),
+            'banner_fb' => $this->processAttachments($fields['Banner (FB)'] ?? null),
             'job_logo' => $this->processAttachments($fields['Job Logo'] ?? null),
         ]);
 
@@ -163,6 +164,16 @@ class SyncSingleJob extends Command
         }
         
         return $value;
+    }
+
+    private function processLinkedRecord($value): ?string
+    {
+        if (!$value || !is_array($value) || empty($value)) {
+            return null;
+        }
+        
+        // Nimm die erste verknüpfte Record-ID
+        return $value[0] ?? null;
     }
 
     private function processInfoFuerUns(?array $attachments, string $recordId): ?string
