@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Stellenanzeigen schalten - Multikanal-Jobmarketing im Allgäu | Ihre Stelle')
+@section('title', 'Stellenanzeigen schalten - Multikanal-Jobmarketing | Ihre Stelle')
 @section('description', 'Ihre Stellenanzeige auf über 15 Plattformen ✓ 1 Jahr Laufzeit ✓ Social Media Marketing ✓ Newsletter-Versand ✓ Persönliche Bewerberansprache ✓ Faire Festpreise')
 @section('keywords', 'Stellenanzeige schalten, Multikanal-Recruiting, Jobs veröffentlichen Allgäu, Personalsuche Kempten, Stellenmarkt Allgäu, Jobbörse Allgäu')
 
@@ -10,7 +10,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center">
             <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
-                Finden Sie Ihre idealen Mitarbeiter im Allgäu
+                Finden Sie Ihre idealen Mitarbeiter
             </h1>
             <p class="mt-6 max-w-2xl mx-auto text-xl text-white">
                 Erreichen Sie mit Ihrer Stellenanzeige gezielt qualifizierte Fachkräfte in der Region. 
@@ -50,7 +50,7 @@
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 mb-4">Starke regionale Präsenz</h3>
                     <p class="text-gray-600">
-                        Ihre Stellenanzeige erreicht gezielt Fachkräfte im Allgäu und Umgebung. 
+                        Ihre Stellenanzeige erreicht gezielt Fachkräfte. 
                         Profitieren Sie von unserer etablierten Position als führende regionale Jobbörse.
                     </p>
                 </div>
@@ -320,7 +320,7 @@
                         <div class="ml-3">
                             <h4 class="text-lg font-medium text-gray-900">Lokale Expertise</h4>
                             <p class="mt-2 text-gray-600">
-                                Als Unternehmen aus dem Allgäu kennen wir den regionalen Arbeitsmarkt 
+                                Als Unternehmen kennen wir den regionalen Arbeitsmarkt 
                                 und die Bedürfnisse der Arbeitgeber und Arbeitnehmer.
                             </p>
                         </div>
@@ -434,7 +434,7 @@
                         Welche Reichweite hat meine Stellenanzeige?
                     </dt>
                     <dd class="mt-2 text-gray-600">
-                        Ihre Anzeige erreicht Fachkräfte im gesamten Allgäu und den angrenzenden Regionen. 
+                        Ihre Anzeige erreicht Fachkräfte . 
                         Zusätzlich wird sie über verschiedene Partner-Netzwerke verbreitet.
                     </dd>
                 </div>
