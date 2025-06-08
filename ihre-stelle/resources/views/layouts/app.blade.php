@@ -107,8 +107,8 @@
                         </a>
                     </div>
 
-                  <!--  <div class="hidden md:flex items-center space-x-8">
-                        <a href="{{ route('home') }}" class="nav-link px-3 py-2 text-sm font-medium transition-colors">
+                   <div class="hidden md:flex items-center space-x-8">
+                        <!-- <a href="{{ route('home') }}" class="nav-link px-3 py-2 text-sm font-medium transition-colors">
                             Home
                         </a>
                         <a href="{{ route('jobs.search') }}" class="nav-link px-3 py-2 text-sm font-medium transition-colors">
