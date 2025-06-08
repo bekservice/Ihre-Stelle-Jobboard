@@ -53,7 +53,7 @@
                             <option value="">Alle Arbeitszeiten</option>
                             @foreach($jobTypes as $jobType)
                                 <option value="{{ $jobType }}" {{ request('job_type') == $jobType ? 'selected' : '' }}>
-                                    {{ $jobType }}
+                                    {{ is_string($jobType) ? $jobType : (is_array($jobType) ? implode(', ', $jobType) : '') }}
                                 </option>
                             @endforeach
                         </select>
@@ -152,10 +152,20 @@
                                             <p class="text-gray-700 font-medium mb-2">{{ $job->arbeitsgeber_name }}</p>
                                         @endif
                                     </div>
-                                    @if($job->job_logo && is_array($job->job_logo) && count($job->job_logo) > 0)
-                                        <img src="{{ $job->job_logo[0]['url'] ?? '' }}" 
-                                             alt="Logo" 
-                                             class="w-12 h-12 rounded-lg object-cover ml-4">
+                                    @if($job->job_logo)
+                                        @php
+                                            $logoUrl = '';
+                                            if (is_array($job->job_logo) && count($job->job_logo) > 0) {
+                                                $logoUrl = $job->job_logo[0]['url'] ?? '';
+                                            } elseif (is_string($job->job_logo)) {
+                                                $logoUrl = $job->job_logo;
+                                            }
+                                        @endphp
+                                        @if($logoUrl)
+                                            <img src="{{ $logoUrl }}" 
+                                                 alt="Logo" 
+                                                 class="w-12 h-12 rounded-lg object-cover ml-4">
+                                        @endif
                                     @endif
                                 </div>
 
@@ -170,12 +180,12 @@
                                         </div>
                                     @endif
                                     
-                                    @if($job->job_type && is_array($job->job_type))
+                                    @if($job->job_type)
                                         <div class="flex items-center">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
-                                            {{ implode(', ', $job->job_type) }}
+                                            {{ is_array($job->job_type) ? implode(', ', $job->job_type) : $job->job_type }}
                                         </div>
                                     @endif
                                     
@@ -204,8 +214,11 @@
                                             {{ $job->kategorie }}
                                         </span>
                                     @endif
-                                    @if($job->autotags && is_array($job->autotags))
-                                        @foreach(array_slice($job->autotags, 0, 3) as $tag)
+                                    @if($job->autotags)
+                                        @php
+                                            $tags = is_array($job->autotags) ? $job->autotags : [$job->autotags];
+                                        @endphp
+                                        @foreach(array_slice($tags, 0, 3) as $tag)
                                             <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
                                                 {{ $tag }}
                                             </span>

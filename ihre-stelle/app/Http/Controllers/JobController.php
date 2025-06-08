@@ -85,7 +85,8 @@ class JobController extends Controller
         }
 
         if ($request->filled('job_type')) {
-            $query->where('job_type', $request->get('job_type'));
+            $jobType = $request->get('job_type');
+            $query->whereJsonContains('job_type', $jobType);
         }
 
         $jobs = $query->latest('created_at')->paginate(20);
@@ -102,11 +103,18 @@ class JobController extends Controller
             ->pluck('city')
             ->sort();
 
-        $jobTypes = JobPost::where('is_active', true)
+        // Get all unique job types from JSON arrays
+        $allJobTypes = JobPost::where('is_active', true)
             ->whereNotNull('job_type')
-            ->distinct()
+            ->get()
             ->pluck('job_type')
-            ->sort();
+            ->filter()
+            ->flatten()
+            ->unique()
+            ->sort()
+            ->values();
+        
+        $jobTypes = $allJobTypes;
 
         return view('jobs.search', compact('jobs', 'categories', 'locations', 'jobTypes'));
     }
