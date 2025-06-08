@@ -95,6 +95,7 @@ class SyncAirtableJobs extends Command
             'arbeitsgeber_name' => $fields['Arbeitsgeber name'] ?? null,
             'arbeitsgeber_tel' => $this->processMultipleSelect($fields['Arbeitsgeber Tel'] ?? null),
             'arbeitsgeber_website' => $this->processMultipleSelect($fields['Arbeitsgeber website'] ?? null),
+            'arbeitsgeber_final_id' => $this->processLinkedRecord($fields['Arbeitsgeber-Final'] ?? null),
             
             // Job Details
             'grundgehalt' => $fields['Grundgehalt'] ?? null,
@@ -176,6 +177,16 @@ class SyncAirtableJobs extends Command
         }
         
         return $value;
+    }
+
+    private function processLinkedRecord($value): ?string
+    {
+        if (!$value || !is_array($value) || empty($value)) {
+            return null;
+        }
+        
+        // Nimm die erste verknüpfte Record-ID
+        return $value[0] ?? null;
     }
 
     private function processInfoFuerUns(?array $attachments, string $recordId): ?string
