@@ -67,17 +67,19 @@
             }
             
             if (!viteCssLoaded) {
-                // Load fallback CSS
-                var fallbackCSS = document.createElement('link');
-                fallbackCSS.rel = 'stylesheet';
-                fallbackCSS.href = '{{ asset("css/custom-compiled.css") }}';
-                document.head.appendChild(fallbackCSS);
-                
                 // Load Tailwind CSS from CDN as fallback
                 var tailwindCSS = document.createElement('link');
                 tailwindCSS.rel = 'stylesheet';
                 tailwindCSS.href = 'https://cdn.tailwindcss.com';
                 document.head.appendChild(tailwindCSS);
+                
+                // Load Ihre-Stelle fallback CSS
+                var fallbackCSS = document.createElement('link');
+                fallbackCSS.rel = 'stylesheet';
+                fallbackCSS.href = '{{ asset("css/ihre-stelle-styles.css") }}';
+                document.head.appendChild(fallbackCSS);
+                
+                console.log('Vite CSS failed to load, using fallback styles');
             }
         }, 1000);
     </script>
