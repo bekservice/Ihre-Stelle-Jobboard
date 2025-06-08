@@ -107,7 +107,7 @@
                         </a>
                     </div>
 
-                    <div class="hidden md:flex items-center space-x-8">
+                  <!--  <div class="hidden md:flex items-center space-x-8">
                         <a href="{{ route('home') }}" class="nav-link px-3 py-2 text-sm font-medium transition-colors">
                             Home
                         </a>
@@ -116,7 +116,7 @@
                         </a>
                         <a href="#" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">
                             Job posten
-                        </a>
+                        </a> -->
                     </div>
 
                     <!-- Mobile menu button -->
@@ -135,7 +135,7 @@
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
                     <a href="{{ route('home') }}" class="nav-link block px-3 py-2 text-base font-medium">Home</a>
                     <a href="{{ route('jobs.search') }}" class="nav-link block px-3 py-2 text-base font-medium">Jobs suchen</a>
-                    <a href="#" class="btn-primary block px-3 py-2 rounded-lg text-base font-medium text-center">Job posten</a>
+                  <!--  <a href="#" class="btn-primary block px-3 py-2 rounded-lg text-base font-medium text-center">Job posten</a> -->
                 </div>
             </div>
         </nav>
