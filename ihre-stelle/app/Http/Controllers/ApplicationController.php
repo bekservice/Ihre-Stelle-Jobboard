@@ -19,7 +19,7 @@ class ApplicationController extends Controller
         return view('applications.form', compact('job'));
     }
 
-    public function store(Request $request, JobPost $job, FileUploadService $fileUploadService)
+    public function store(Request $request, JobPost $job)
     {
         $validator = Validator::make($request->all(), [
             'vorname' => 'required|string|max:255',
