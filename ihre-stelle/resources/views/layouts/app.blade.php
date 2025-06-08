@@ -47,6 +47,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
     
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
     <!-- Mapbox CSS -->
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
 
@@ -112,6 +115,11 @@
                             Jobs suchen
                         </a>
                         
+                        <!-- Job-Alert Icon -->
+                        <a href="{{ route('job-alerts.create') }}" class="p-2 text-gray-600 hover:text-primary-orange transition-colors" title="Job-Alert erstellen">
+                            <i class="fa-solid fa-bell text-xl"></i>
+                        </a>
+                        
                         <!-- Gespeicherte Jobs Icon -->
                         <button id="saved-jobs-btn" class="relative p-2 text-gray-600 hover:text-primary-orange transition-colors" title="Gespeicherte Jobs">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,6 +132,11 @@
 
                     <!-- Mobile menu button -->
                     <div class="md:hidden flex items-center space-x-2">
+                        <!-- Job-Alert Icon Mobile -->
+                        <a href="{{ route('job-alerts.create') }}" class="p-2 text-gray-600 hover:text-primary-orange transition-colors" title="Job-Alert erstellen">
+                            <i class="fa-solid fa-bell text-xl"></i>
+                        </a>
+                        
                         <!-- Gespeicherte Jobs Icon Mobile -->
                         <button id="saved-jobs-btn-mobile" class="relative p-2 text-gray-600 hover:text-primary-orange transition-colors" title="Gespeicherte Jobs">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

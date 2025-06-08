@@ -3,9 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Models\JobPost;
+use App\Models\JobAlert;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 
 class SyncAirtableJobs extends Command
@@ -115,13 +117,17 @@ class SyncAirtableJobs extends Command
             $post->slug = Str::slug($post->title.'-'.Str::random(6));
         }
 
+        $wasRecentlyCreated = !$post->exists;
         $post->save();
         
         // Update Airtable with Ihre-Stelle URL
         $this->updateAirtableRecord($record['id'], $post);
         
-        if ($post->wasRecentlyCreated) {
+        if ($wasRecentlyCreated) {
             $this->line("✓ Created: {$post->title}");
+            
+            // Sende sofortige Job-Alerts für neue Jobs
+            $this->sendImmediateJobAlerts($post);
         } else {
             $this->line("↻ Updated: {$post->title}");
         }
@@ -248,6 +254,43 @@ class SyncAirtableJobs extends Command
             }
         } catch (\Exception $e) {
             $this->warn("Error updating Airtable record {$recordId}: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Sendet sofortige Job-Alerts für einen neuen Job
+     */
+    private function sendImmediateJobAlerts(JobPost $job): void
+    {
+        // Finde alle aktiven und verifizierten Alerts mit "immediate" Frequenz
+        $alerts = JobAlert::active()
+            ->verified()
+            ->where('frequency', 'immediate')
+            ->get();
+
+        if ($alerts->isEmpty()) {
+            return;
+        }
+
+        $sentCount = 0;
+        foreach ($alerts as $alert) {
+            if ($alert->matchesJob($job)) {
+                try {
+                    // Hier würde normalerweise die E-Mail direkt versendet
+                    // Für jetzt rufen wir den Job-Alert-Command auf
+                    Artisan::call('job-alerts:send', [
+                        '--frequency' => 'immediate',
+                        '--test-email' => $alert->email
+                    ]);
+                    $sentCount++;
+                } catch (\Exception $e) {
+                    $this->warn("Failed to send immediate alert to {$alert->email}: " . $e->getMessage());
+                }
+            }
+        }
+
+        if ($sentCount > 0) {
+            $this->line("  → Sent {$sentCount} immediate job alerts");
         }
     }
 }
