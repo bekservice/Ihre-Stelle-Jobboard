@@ -40,7 +40,7 @@ Route::get('/arbeitgeber/{slug}', [EmployerController::class, 'show'])->name('em
 
 // City landing pages  
 Route::get('/staedte', [CityController::class, 'index'])->name('cities.index');
-Route::get('/jobs/{slug}', [CityController::class, 'show'])->name('cities.show');
+Route::get('/standort/{slug}', [CityController::class, 'show'])->name('cities.show');
 
 // Sitemap routes
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
