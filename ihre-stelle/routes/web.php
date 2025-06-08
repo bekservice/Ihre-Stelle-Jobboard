@@ -32,8 +32,7 @@ Route::get('/jobs/{job:slug}/bewerben', [App\Http\Controllers\ApplicationControl
 Route::post('/jobs/{job:slug}/bewerben', [App\Http\Controllers\ApplicationController::class, 'store'])->name('application.store');
 Route::get('/jobs/{job:slug}/bewerbung-erfolgreich', [App\Http\Controllers\ApplicationController::class, 'success'])->name('application.success');
 
-// Webhook routes
-Route::post('/webhook/sync-job', [WebhookController::class, 'syncSingleJob'])->name('webhook.sync-job');
+// Webhook routes moved to api.php for CSRF exemption
 
 // Employer landing pages
 Route::get('/arbeitgeber', [EmployerController::class, 'index'])->name('employers.index');
