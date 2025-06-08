@@ -92,9 +92,9 @@ class SyncAirtableJobs extends Command
             'is_active' => $active,
             
             // Arbeitgeber Informationen
-            'arbeitsgeber_name' => $fields['Arbeitsgeber Name'] ?? null,
+            'arbeitsgeber_name' => $fields['Arbeitsgeber name'] ?? null,
             'arbeitsgeber_tel' => $this->processMultipleSelect($fields['Arbeitsgeber Tel'] ?? null),
-            'arbeitsgeber_website' => $this->processMultipleSelect($fields['Arbeitsgeber Website'] ?? null),
+            'arbeitsgeber_website' => $this->processMultipleSelect($fields['Arbeitsgeber website'] ?? null),
             
             // Job Details
             'grundgehalt' => $fields['Grundgehalt'] ?? null,
