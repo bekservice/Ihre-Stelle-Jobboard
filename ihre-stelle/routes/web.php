@@ -55,3 +55,8 @@ Route::get('/robots.txt', function () {
     return response($content, 200)
         ->header('Content-Type', 'text/plain');
 });
+
+// Karriere-Seiten
+Route::view('/karriere-tipps', 'career.karriere-tipps')->name('karriere-tipps');
+Route::view('/lebenslauf-hilfe', 'career.lebenslauf-hilfe')->name('lebenslauf-hilfe');
+Route::view('/kontakt', 'legal.kontakt')->name('kontakt');

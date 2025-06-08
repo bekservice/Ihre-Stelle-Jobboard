@@ -228,8 +228,8 @@
                         <h4 class="text-lg font-semibold mb-4">Für Jobsuchende</h4>
                         <ul class="space-y-2 text-gray-300">
                             <li><a href="{{ route('jobs.search') }}" class="hover:text-white transition-colors">Jobs suchen</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Karriere-Tipps</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Lebenslauf-Hilfe</a></li>
+                            <li><a href="{{ route('karriere-tipps') }}" class="hover:text-white transition-colors">Karriere-Tipps</a></li>
+                            <li><a href="{{ route('lebenslauf-hilfe') }}" class="hover:text-white transition-colors">Lebenslauf-Hilfe</a></li>
                             <li><a href="#" class="hover:text-white transition-colors">Gehaltsvergleich</a></li>
                         </ul>
                     </div>
@@ -240,7 +240,7 @@
                             <li><a href="#" class="hover:text-white transition-colors">Job posten</a></li>
                             <li><a href="#" class="hover:text-white transition-colors">Kandidaten suchen</a></li>
                             <li><a href="#" class="hover:text-white transition-colors">Preise</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Kontakt</a></li>
+                            <li><a href="{{ route('kontakt') }}" class="hover:text-white transition-colors">Kontakt</a></li>
                         </ul>
                     </div>
                     
