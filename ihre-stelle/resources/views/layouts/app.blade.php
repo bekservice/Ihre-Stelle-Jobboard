@@ -262,7 +262,6 @@
                             <p class="mt-1">HRB: 14544 | Steuer-Nr.: 127/122/20552 | USt-IdNr.: DE322920054</p>
                         </div>
                         <div class="text-center md:text-right">
-                            <p>Geschäftsführer: Iman Khabazi Koma</p>
                             <p class="mt-1">Registergericht: Kempten (Allgäu)</p>
                         </div>
                     </div>
