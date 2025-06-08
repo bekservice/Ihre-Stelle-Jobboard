@@ -54,6 +54,8 @@ class JobPost extends Model
         'contact_email',
         'slug',
         'is_active',
+        'schulabschluss',
+        'ablaufdatum',
     ];
 
     protected $casts = [
@@ -62,7 +64,10 @@ class JobPost extends Model
         'angelegt_am' => 'datetime',
         'last_modified_time_status' => 'datetime',
         'lastmodify_time' => 'datetime',
+        'job_type' => 'json',
         'job_typ_multiple' => 'json',
+        'arbeitsgeber_tel' => 'json',
+        'arbeitsgeber_website' => 'json',
         'banner_fb' => 'json',
         'job_logo' => 'json',
         'autotags' => 'json',
