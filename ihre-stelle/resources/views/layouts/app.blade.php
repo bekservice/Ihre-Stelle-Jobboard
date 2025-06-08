@@ -237,7 +237,7 @@
                     <div>
                         <h4 class="text-lg font-semibold mb-4">Für Arbeitgeber</h4>
                         <ul class="space-y-2 text-gray-300">
-                            <li><a href="#" class="hover:text-white transition-colors">Job posten</a></li>
+                            <li><a href="{{ route('post-job') }}" class="hover:text-white transition-colors">Job posten</a></li>
                             <li><a href="#" class="hover:text-white transition-colors">Kandidaten suchen</a></li>
                             <li><a href="#" class="hover:text-white transition-colors">Preise</a></li>
                             <li><a href="{{ route('kontakt') }}" class="hover:text-white transition-colors">Kontakt</a></li>

@@ -60,3 +60,6 @@ Route::get('/robots.txt', function () {
 Route::view('/karriere-tipps', 'career.karriere-tipps')->name('karriere-tipps');
 Route::view('/lebenslauf-hilfe', 'career.lebenslauf-hilfe')->name('lebenslauf-hilfe');
 Route::view('/kontakt', 'legal.kontakt')->name('kontakt');
+
+// Arbeitgeber
+Route::view('/job-posten', 'employers.post-job')->name('post-job');
