@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\JobPost;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class SyncSingleJob extends Command
@@ -69,6 +70,7 @@ class SyncSingleJob extends Command
             'anrede' => $fields['Anrede'] ?? null,
             'description' => $fields['Job beschreibung'] ?? null,
             'ansprechpartner_hr' => $fields['Ansprechpartner (HR)'] ?? null,
+            'info_fuer_uns' => $this->processInfoFuerUns($fields['Info für uns'] ?? null, $record['id']),
             'bewerbungen_an_link' => $fields['Bewerbungen an Link'] ?? null,
             'bewerbung_an_mail' => $fields['Bewerbung an Mail'] ?? null,
             'status' => $status,
@@ -161,6 +163,57 @@ class SyncSingleJob extends Command
         }
         
         return $value;
+    }
+
+    private function processInfoFuerUns(?array $attachments, string $recordId): ?string
+    {
+        if (!$attachments || !is_array($attachments) || empty($attachments)) {
+            return null;
+        }
+
+        // Nur das erste Bild verwenden
+        $firstAttachment = $attachments[0];
+        $imageUrl = $firstAttachment['url'] ?? null;
+        
+        if (!$imageUrl) {
+            return null;
+        }
+
+        // Prüfen ob es ein Bild ist
+        $type = $firstAttachment['type'] ?? '';
+        if (!str_starts_with($type, 'image/')) {
+            return null;
+        }
+
+        try {
+            // Dateiname generieren
+            $extension = pathinfo($firstAttachment['filename'] ?? 'image.jpg', PATHINFO_EXTENSION);
+            $filename = 'job_logo_' . $recordId . '.' . $extension;
+            $localPath = 'job-logos/' . $filename;
+
+            // Prüfen ob Datei bereits existiert
+            if (Storage::disk('public')->exists($localPath)) {
+                $this->line("  → Logo bereits vorhanden: {$filename}");
+                return $localPath;
+            }
+
+            // Bild herunterladen
+            $response = Http::timeout(30)->get($imageUrl);
+            
+            if ($response->successful()) {
+                // Bild lokal speichern
+                Storage::disk('public')->put($localPath, $response->body());
+                $this->line("  → Logo heruntergeladen: {$filename}");
+                return $localPath;
+            } else {
+                $this->warn("  → Fehler beim Herunterladen des Logos: HTTP {$response->status()}");
+                return null;
+            }
+
+        } catch (\Exception $e) {
+            $this->warn("  → Fehler beim Verarbeiten des Logos: " . $e->getMessage());
+            return null;
+        }
     }
 
     private function updateAirtableRecord(string $recordId, JobPost $job): void

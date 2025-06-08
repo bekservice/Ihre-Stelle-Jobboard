@@ -48,9 +48,13 @@
                                 <p class="text-xl text-gray-700 font-medium mb-2">{{ $job->arbeitsgeber_name }}</p>
                             @endif
                         </div>
-                        @if($job->job_logo && is_array($job->job_logo) && count($job->job_logo) > 0)
+                        @if($job->info_fuer_uns && Storage::disk('public')->exists($job->info_fuer_uns))
+                            <img src="{{ asset('storage/' . $job->info_fuer_uns) }}" 
+                                 alt="Logo von {{ $job->arbeitsgeber_name ?? 'Unternehmen' }}" 
+                                 class="w-16 h-16 rounded-lg object-cover ml-6">
+                        @elseif($job->job_logo && is_array($job->job_logo) && count($job->job_logo) > 0)
                             <img src="{{ $job->job_logo[0]['url'] ?? '' }}" 
-                                 alt="Firmenlogo" 
+                                 alt="Logo von {{ $job->arbeitsgeber_name ?? 'Unternehmen' }}" 
                                  class="w-16 h-16 rounded-lg object-cover ml-6">
                         @endif
                     </div>

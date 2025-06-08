@@ -152,7 +152,11 @@
                                             <p class="text-gray-700 font-medium mb-2">{{ $job->arbeitsgeber_name }}</p>
                                         @endif
                                     </div>
-                                    @if($job->job_logo)
+                                    @if($job->info_fuer_uns && Storage::disk('public')->exists($job->info_fuer_uns))
+                                        <img src="{{ asset('storage/' . $job->info_fuer_uns) }}" 
+                                             alt="Logo von {{ $job->arbeitsgeber_name ?? 'Unternehmen' }}" 
+                                             class="w-12 h-12 rounded-lg object-cover ml-4">
+                                    @elseif($job->job_logo)
                                         @php
                                             $logoUrl = '';
                                             if (is_array($job->job_logo) && count($job->job_logo) > 0) {
@@ -163,7 +167,7 @@
                                         @endphp
                                         @if($logoUrl)
                                             <img src="{{ $logoUrl }}" 
-                                                 alt="Logo" 
+                                                 alt="Logo von {{ $job->arbeitsgeber_name ?? 'Unternehmen' }}" 
                                                  class="w-12 h-12 rounded-lg object-cover ml-4">
                                         @endif
                                     @endif
