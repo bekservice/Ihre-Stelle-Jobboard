@@ -1,61 +1,335 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Ihre-Stelle Jobboard
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Ein modernes Laravel-basiertes Jobboard mit Airtable-Integration, Mapbox-Karten und Express-Bewerbungssystem.
 
-## About Laravel
+## 🚀 Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Airtable-Integration**: Automatische Synchronisation von Jobs aus Airtable
+- **Mapbox-Karten**: Interaktive Karten für Job-Standorte
+- **Express-Bewerbungen**: Direktes Bewerbungssystem mit Datei-Upload
+- **Responsive Design**: Moderne UI mit Ihre-Stelle Branding
+- **Automatische Synchronisation**: Stündliche Updates via Laravel Scheduler
+- **Webhook-Support**: Sofortige Updates einzelner Jobs
+- **SEO-optimiert**: Saubere URLs und Meta-Tags
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📋 Voraussetzungen
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.3+
+- Composer
+- Node.js & NPM
+- MySQL/MariaDB
+- Airtable Account
+- Mapbox Account
 
-## Learning Laravel
+## 🛠 Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. Repository klonen
+```bash
+git clone <repository-url>
+cd ihre-stelle
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 2. Dependencies installieren
+```bash
+composer install
+npm install
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 3. Environment konfigurieren
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## Laravel Sponsors
+### 4. Datenbank konfigurieren
+Bearbeite `.env` mit deinen Datenbankdaten:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=ihre_stelle
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 5. Datenbank migrieren
+```bash
+php artisan migrate:fresh
+```
 
-### Premium Partners
+### 6. Assets kompilieren
+```bash
+npm run build
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## ⚙️ Konfiguration
 
-## Contributing
+### Airtable-Integration
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Füge folgende Variablen zu deiner `.env` hinzu:
 
-## Code of Conduct
+```env
+AIRTABLE_API_KEY=your_airtable_api_key
+AIRTABLE_BASE_ID=your_base_id
+AIRTABLE_JOBS_TABLE=Jobs
+AIRTABLE_KANDIDATEN_TABLE=Kandidaten
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**Airtable-Tabellen Setup:**
 
-## Security Vulnerabilities
+#### Jobs-Tabelle
+Erforderliche Felder:
+- Job Titel (Single line text)
+- Anrede (Single line text)
+- Job beschreibung (Long text)
+- Status (Single select: "Live", "Entwurf", etc.)
+- Kategorie (Single line text)
+- Stadt (Single line text)
+- PLZ_Job (Single line text)
+- longitude (Number)
+- latitude (Number)
+- Arbeitsgeber Name (Single line text)
+- Arbeitsgeber Tel (Multiple select)
+- Arbeitsgeber Website (Multiple select)
+- JobTyp (Multiple select)
+- Autotags (Multiple select)
+- Benefits (Multiple select)
+- Rolle im Job (Multiple select)
+- Berufserfahrung (Single line text)
+- Schulabschluss (Single line text)
+- Job Logo (Attachment)
+- Banner FB (Attachment)
+- Ihre-StelleLink (Single line text) - wird automatisch befüllt
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+#### Kandidaten-Tabelle
+Erforderliche Felder:
+- Name (Single line text)
+- Vorname(PG) (Single line text)
+- Mail von Bewerber/-in (Email)
+- Telephone (Phone number)
+- Nachricht (Long text)
+- Link to Jobs (Link to another record)
+- Status (Single select: "Ready", "Contacted", etc.)
+- Quelle (Single line text)
+- Unterlagen (Attachment)
 
-## License
+### Mapbox-Integration
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```env
+MAPBOX_ACCESS_TOKEN=pk.eyJ1IjoiYmVrc2VydmljZSIsImEiOiJjazl2NnB3bjAwOG82M3BydWxtazQyczdkIn0.w_HtU8Vi9uRDtZa0Qy3FqA
+```
+
+### Mail-Konfiguration
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=your-smtp-host
+MAIL_PORT=587
+MAIL_USERNAME=your-email
+MAIL_PASSWORD=your-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@ihre-stelle.de
+MAIL_FROM_NAME="Ihre-Stelle"
+```
+
+## 🔄 Synchronisation
+
+### Automatische Synchronisation
+
+Das System synchronisiert automatisch stündlich alle Jobs aus Airtable:
+
+```bash
+# Scheduler starten (für lokale Entwicklung)
+php artisan schedule:work
+
+# Für Produktion: Cron-Job einrichten
+* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+### Manuelle Synchronisation
+
+```bash
+# Alle Jobs synchronisieren
+php artisan airtable:sync
+
+# Einzelnen Job synchronisieren
+php artisan airtable:sync-job {airtable_record_id}
+```
+
+## 🔗 Webhook-Integration
+
+### Webhook-URL für Airtable Automations
+
+```
+POST https://ihre-stelle.de/webhook/sync-job
+Content-Type: application/json
+
+{
+    "id": "airtable_record_id"
+}
+```
+
+**Airtable Automation Setup:**
+1. Gehe zu Automations in deiner Airtable Base
+2. Erstelle neue Automation mit Trigger "When record updated"
+3. Füge Action "Send webhook" hinzu
+4. URL: `https://ihre-stelle.de/webhook/sync-job`
+5. Method: POST
+6. Body: `{"id": "{Record ID}"}`
+
+### Webhook für Job-Updates
+
+Wenn ein Job in Airtable aktualisiert wird, wird automatisch:
+- Der Job in der Laravel-Datenbank aktualisiert
+- Das Feld "Ihre-StelleLink" in Airtable mit der korrekten URL befüllt
+
+## 🎨 Design & Branding
+
+### Ihre-Stelle Farben
+
+```css
+/* Primary Colors */
+--primary-orange: #C4704A;
+--primary-blue: #4A5568;
+
+/* Accent Colors */
+--accent-orange: #ED8936;
+--accent-blue: #3182CE;
+```
+
+### Logo-Dateien
+
+- Logo: `/public/logo/ihre-stelle_logo_quer-logo.png`
+- Favicon: `/public/favicon.ico`
+
+## 📱 Seiten & Routen
+
+### Öffentliche Seiten
+- **Homepage**: `/` - Übersicht mit Featured Jobs
+- **Job-Suche**: `/jobs/search` - Suche mit Filtern und Karte
+- **Job-Details**: `/jobs/{slug}` - Einzelne Job-Ansicht
+- **Bewerbung**: `/jobs/{slug}/bewerben` - Express-Bewerbungsformular
+- **Erfolg**: `/jobs/{slug}/bewerbung-erfolgreich` - Bestätigungsseite
+
+### Rechtliche Seiten
+- **Impressum**: `/impressum`
+- **Datenschutz**: `/datenschutz`
+
+### API-Endpunkte
+- **Webhook**: `POST /webhook/sync-job`
+- **Sitemap**: `/sitemap.xml`
+
+## 🗂 Dateistruktur
+
+```
+ihre-stelle/
+├── app/
+│   ├── Console/Commands/
+│   │   ├── SyncAirtableJobs.php      # Haupt-Sync-Command
+│   │   └── SyncSingleJob.php         # Einzelner Job-Sync
+│   ├── Http/Controllers/
+│   │   ├── JobController.php         # Job-Anzeige und Suche
+│   │   ├── ApplicationController.php # Bewerbungssystem
+│   │   └── WebhookController.php     # Webhook-Handler
+│   └── Models/
+│       ├── JobPost.php               # Job-Model mit Airtable-Mapping
+│       └── Application.php           # Bewerbungs-Model
+├── resources/
+│   ├── views/
+│   │   ├── jobs/                     # Job-Templates
+│   │   ├── applications/             # Bewerbungs-Templates
+│   │   └── legal/                    # Rechtliche Seiten
+│   └── css/
+│       └── ihre-stelle-styles.css    # Custom Styles
+└── public/
+    ├── logo/                         # Logo-Dateien
+    └── css/
+        └── ihre-stelle-styles.css    # Fallback CSS
+```
+
+## 🚀 Deployment
+
+### cPanel Deployment
+
+1. **Dateien hochladen**:
+   - Alle Dateien außer `/public` in einen Ordner (z.B. `ihre-stelle`)
+   - Inhalt von `/public` in das Document Root
+
+2. **Symlinks erstellen**:
+   ```bash
+   ln -s ../ihre-stelle/storage/app/public public/storage
+   ```
+
+3. **Environment**:
+   - `.env` Datei mit Produktionsdaten erstellen
+   - `APP_ENV=production` setzen
+   - `APP_DEBUG=false` setzen
+
+4. **Datenbank**:
+   ```bash
+   php artisan migrate:fresh
+   ```
+
+5. **Assets**:
+   - Build-Ordner ist bereits im Git enthalten
+   - Fallback CSS ist verfügbar unter `/css/ihre-stelle-styles.css`
+
+6. **Cron-Job einrichten**:
+   ```bash
+   * * * * * cd /home/username/ihre-stelle && php artisan schedule:run >> /dev/null 2>&1
+   ```
+
+### Wichtige Produktions-Einstellungen
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://ihre-stelle.de
+
+# Session & Cache
+SESSION_DRIVER=file
+CACHE_DRIVER=file
+QUEUE_CONNECTION=sync
+
+# Logs
+LOG_CHANNEL=single
+LOG_LEVEL=error
+```
+
+## 🔧 Wartung
+
+### Cache leeren
+```bash
+php artisan route:clear
+php artisan view:clear
+php artisan config:clear
+php artisan cache:clear
+```
+
+### Logs überprüfen
+```bash
+tail -f storage/logs/laravel.log
+```
+
+### Sync-Status überprüfen
+```bash
+php artisan airtable:sync --dry-run
+```
+
+## 📞 Support & Kontakt
+
+**BEK Service GmbH**
+- Website: https://ihre-stelle.de
+- E-Mail: info@bekservice.de
+- Telefon: (+49) 831 93065616
+- Adresse: Westendstr. 2A, D-87439 Kempten (Allgäu)
+
+## 📄 Lizenz
+
+Proprietary - BEK Service GmbH
+
+---
+
+**Letzte Aktualisierung**: Januar 2025
+**Laravel Version**: 12.17.0
+**PHP Version**: 8.3+
