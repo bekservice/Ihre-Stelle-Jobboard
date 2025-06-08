@@ -53,6 +53,35 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js'])
 
+    <!-- Fallback CSS if Vite assets fail to load -->
+    <script>
+        // Check if Vite CSS loaded, if not load fallback
+        setTimeout(function() {
+            var viteCssLoaded = false;
+            var stylesheets = document.querySelectorAll('link[rel="stylesheet"]');
+            for (var i = 0; i < stylesheets.length; i++) {
+                if (stylesheets[i].href.includes('custom-') || stylesheets[i].href.includes('app-')) {
+                    viteCssLoaded = true;
+                    break;
+                }
+            }
+            
+            if (!viteCssLoaded) {
+                // Load fallback CSS
+                var fallbackCSS = document.createElement('link');
+                fallbackCSS.rel = 'stylesheet';
+                fallbackCSS.href = '{{ asset("css/custom-compiled.css") }}';
+                document.head.appendChild(fallbackCSS);
+                
+                // Load Tailwind CSS from CDN as fallback
+                var tailwindCSS = document.createElement('link');
+                tailwindCSS.rel = 'stylesheet';
+                tailwindCSS.href = 'https://cdn.tailwindcss.com';
+                document.head.appendChild(tailwindCSS);
+            }
+        }, 1000);
+    </script>
+
     <!-- Additional Styles -->
     <style>
         body { font-family: 'Inter', sans-serif; }
