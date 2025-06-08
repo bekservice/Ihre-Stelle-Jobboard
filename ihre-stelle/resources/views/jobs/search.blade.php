@@ -132,7 +132,28 @@
 
             <!-- Map View -->
             <div id="map-view" class="hidden mb-8">
-                <x-job-map :jobs="$jobs" height="500px" />
+                @if($mapJobs->count() > 0)
+                    <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p class="text-sm text-blue-700">
+                            <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            {{ $mapJobs->count() }} Jobs mit Standortdaten werden auf der Karte angezeigt
+                        </p>
+                    </div>
+                    <x-job-map :jobs="$mapJobs" height="500px" />
+                @else
+                    <div class="text-center py-12 bg-gray-50 rounded-lg">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m0 0L9 7"></path>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">Keine Standortdaten verfügbar</h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Für die gefundenen Jobs sind keine Koordinaten verfügbar, um sie auf der Karte anzuzeigen.
+                        </p>
+                    </div>
+                @endif
             </div>
 
             <!-- Job Listings -->

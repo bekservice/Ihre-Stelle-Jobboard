@@ -18,16 +18,20 @@ document.addEventListener('DOMContentLoaded', function() {
         zoom: 6
     });
     
+    // Make map available globally for resize events
+    window.map = map;
+    
     // Add navigation controls
     map.addControl(new mapboxgl.NavigationControl());
     
     // Jobs data from Laravel
     const jobs = @json($jobs);
+    console.log('Jobs data for map:', jobs);
     
     map.on('load', function() {
         // Add jobs as markers
         jobs.forEach(function(job) {
-            if (job.longitude && job.latitude) {
+            if (job.longitude && job.latitude && job.longitude !== '' && job.latitude !== '') {
                 // Create custom marker
                 const markerElement = document.createElement('div');
                 markerElement.className = 'map-marker';
@@ -69,23 +73,57 @@ document.addEventListener('DOMContentLoaded', function() {
                 }).setHTML(popupContent);
                 
                 // Add marker to map
-                new mapboxgl.Marker(markerElement)
-                    .setLngLat([job.longitude, job.latitude])
-                    .setPopup(popup)
-                    .addTo(map);
+                try {
+                    const lng = parseFloat(job.longitude);
+                    const lat = parseFloat(job.latitude);
+                    
+                    if (!isNaN(lng) && !isNaN(lat)) {
+                        new mapboxgl.Marker(markerElement)
+                            .setLngLat([lng, lat])
+                            .setPopup(popup)
+                            .addTo(map);
+                        console.log('Added marker for job:', job.title, 'at', lng, lat);
+                    } else {
+                        console.error('Invalid coordinates for job:', job.title, job.longitude, job.latitude);
+                    }
+                } catch (error) {
+                    console.error('Error creating marker for job:', job.title, error);
+                }
             }
         });
         
         // Fit map to show all markers if jobs exist
         if (jobs.length > 0) {
-            const validJobs = jobs.filter(job => job.longitude && job.latitude);
+            const validJobs = jobs.filter(job => job.longitude && job.latitude && job.longitude !== '' && job.latitude !== '');
+            console.log('Valid jobs with coordinates:', validJobs.length);
+            
             if (validJobs.length > 0) {
                 const bounds = new mapboxgl.LngLatBounds();
                 validJobs.forEach(job => {
-                    bounds.extend([job.longitude, job.latitude]);
+                    try {
+                        const lng = parseFloat(job.longitude);
+                        const lat = parseFloat(job.latitude);
+                        if (!isNaN(lng) && !isNaN(lat)) {
+                            bounds.extend([lng, lat]);
+                        }
+                    } catch (error) {
+                        console.error('Error parsing coordinates for job:', job.id, error);
+                    }
                 });
-                map.fitBounds(bounds, { padding: 50 });
+                
+                try {
+                    map.fitBounds(bounds, { padding: 50 });
+                } catch (error) {
+                    console.error('Error fitting bounds:', error);
+                    // Fallback to Germany center
+                    map.setCenter([10.4515, 51.1657]);
+                    map.setZoom(6);
+                }
+            } else {
+                console.log('No valid coordinates found, using default view');
             }
+        } else {
+            console.log('No jobs data available for map');
         }
     });
     

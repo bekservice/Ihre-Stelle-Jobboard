@@ -91,6 +91,14 @@ class JobController extends Controller
 
         $jobs = $query->latest('created_at')->paginate(20);
         
+        // Get all jobs with coordinates for the map (not paginated)
+        $mapJobs = $query->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->where('latitude', '!=', '')
+            ->where('longitude', '!=', '')
+            ->select('id', 'title', 'slug', 'arbeitsgeber_name', 'city', 'latitude', 'longitude')
+            ->get();
+        
         $categories = JobPost::where('is_active', true)
             ->whereNotNull('kategorie')
             ->distinct()
@@ -116,7 +124,7 @@ class JobController extends Controller
         
         $jobTypes = $allJobTypes;
 
-        return view('jobs.search', compact('jobs', 'categories', 'locations', 'jobTypes'));
+        return view('jobs.search', compact('jobs', 'mapJobs', 'categories', 'locations', 'jobTypes'));
     }
 
     public function getSavedJobs(Request $request)
