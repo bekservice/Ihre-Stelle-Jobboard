@@ -37,6 +37,9 @@ return [
 
     'airtable' => [
         'token' => env('AIRTABLE_TOKEN'),
+        'base_id' => env('AIRTABLE_BASE_ID'),
+        'jobs_table' => env('AIRTABLE_JOBS_TABLE', 'Jobs'),
+        'kandidaten_table' => env('AIRTABLE_KANDIDATEN_TABLE', 'Kandidaten'),
     ],
 
 ];

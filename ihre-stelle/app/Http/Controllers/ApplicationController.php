@@ -89,11 +89,25 @@ class ApplicationController extends Controller
                 ]
             ];
 
+            // Log the request for debugging
+            \Log::info('Sending application to Airtable', [
+                'job_id' => $job->id,
+                'airtable_data' => $airtableData,
+                'base_id' => config('services.airtable.base_id'),
+            ]);
+
             // Send to Airtable
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . config('services.airtable.token'),
                 'Content-Type' => 'application/json',
-            ])->post('https://api.airtable.com/v0/' . config('services.airtable.base_id') . '/Kandidaten', $airtableData);
+            ])->post('https://api.airtable.com/v0/' . config('services.airtable.base_id') . '/' . config('services.airtable.kandidaten_table'), $airtableData);
+
+            // Log the response for debugging
+            \Log::info('Airtable response', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+                'successful' => $response->successful(),
+            ]);
 
             if ($response->successful()) {
                 // Clean up temporary files after successful upload
@@ -107,10 +121,23 @@ class ApplicationController extends Controller
                 return redirect()->route('application.success', $job)
                     ->with('success', 'Ihre Bewerbung wurde erfolgreich übermittelt!');
             } else {
-                throw new \Exception('Fehler beim Übermitteln der Bewerbung: ' . $response->body());
+                throw new \Exception('Airtable API Error (Status: ' . $response->status() . '): ' . $response->body());
             }
 
         } catch (\Exception $e) {
+            // Log the detailed error for debugging
+            \Log::error('Application submission failed', [
+                'job_id' => $job->id,
+                'job_airtable_id' => $job->airtable_id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->except(['lebenslauf', 'anschreiben', '_token']),
+                'airtable_config' => [
+                    'base_id' => config('services.airtable.base_id'),
+                    'token_exists' => !empty(config('services.airtable.token')),
+                ]
+            ]);
+
             // Clean up temporary files on error
             if (isset($lebenslaufPath)) {
                 Storage::disk('public')->delete($lebenslaufPath);
@@ -119,7 +146,13 @@ class ApplicationController extends Controller
                 Storage::disk('public')->delete($anschreibenPath);
             }
 
-            return back()->withErrors(['error' => 'Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.'])
+            // Show more specific error in development
+            $errorMessage = 'Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.';
+            if (config('app.debug')) {
+                $errorMessage .= ' (Debug: ' . $e->getMessage() . ')';
+            }
+
+            return back()->withErrors(['error' => $errorMessage])
                 ->withInput();
         }
     }
