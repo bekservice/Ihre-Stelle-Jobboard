@@ -19,7 +19,7 @@ class ApplicationController extends Controller
         return view('applications.form', compact('job'));
     }
 
-    public function store(Request $request, JobPost $job)
+    public function store(Request $request, JobPost $job, FileUploadService $fileUploadService)
     {
         $validator = Validator::make($request->all(), [
             'vorname' => 'required|string|max:255',
@@ -49,25 +49,45 @@ class ApplicationController extends Controller
         }
 
         try {
-            // Upload files to temporary storage
+            // Upload files to public storage with proper URLs
             $attachments = [];
             
             if ($request->hasFile('lebenslauf')) {
-                $lebenslaufPath = $request->file('lebenslauf')->store('temp', 'public');
-                $lebenslaufUrl = url('storage/' . $lebenslaufPath);
+                $filename = 'Lebenslauf_' . $request->vorname . '_' . $request->name . '_' . time() . '.' . $request->file('lebenslauf')->getClientOriginalExtension();
+                $lebenslaufPath = $request->file('lebenslauf')->storeAs('bewerbungen', $filename, 'public');
+                
+                // Create full public URL
+                $lebenslaufUrl = config('app.url') . '/storage/' . $lebenslaufPath;
+                
                 $attachments[] = [
                     'url' => $lebenslaufUrl,
-                    'filename' => 'Lebenslauf_' . $request->vorname . '_' . $request->name . '.' . $request->file('lebenslauf')->getClientOriginalExtension()
+                    'filename' => $filename
                 ];
+                
+                \Log::info('Lebenslauf uploaded', [
+                    'path' => $lebenslaufPath,
+                    'url' => $lebenslaufUrl,
+                    'file_exists' => file_exists(storage_path('app/public/' . $lebenslaufPath))
+                ]);
             }
 
             if ($request->hasFile('anschreiben')) {
-                $anschreibenPath = $request->file('anschreiben')->store('temp', 'public');
-                $anschreibenUrl = url('storage/' . $anschreibenPath);
+                $filename = 'Anschreiben_' . $request->vorname . '_' . $request->name . '_' . time() . '.' . $request->file('anschreiben')->getClientOriginalExtension();
+                $anschreibenPath = $request->file('anschreiben')->storeAs('bewerbungen', $filename, 'public');
+                
+                // Create full public URL
+                $anschreibenUrl = config('app.url') . '/storage/' . $anschreibenPath;
+                
                 $attachments[] = [
                     'url' => $anschreibenUrl,
-                    'filename' => 'Anschreiben_' . $request->vorname . '_' . $request->name . '.' . $request->file('anschreiben')->getClientOriginalExtension()
+                    'filename' => $filename
                 ];
+                
+                \Log::info('Anschreiben uploaded', [
+                    'path' => $anschreibenPath,
+                    'url' => $anschreibenUrl,
+                    'file_exists' => file_exists(storage_path('app/public/' . $anschreibenPath))
+                ]);
             }
 
             // Prepare data for Airtable
@@ -110,13 +130,11 @@ class ApplicationController extends Controller
             ]);
 
             if ($response->successful()) {
-                // Clean up temporary files after successful upload
-                if (isset($lebenslaufPath)) {
-                    Storage::disk('public')->delete($lebenslaufPath);
-                }
-                if (isset($anschreibenPath)) {
-                    Storage::disk('public')->delete($anschreibenPath);
-                }
+                \Log::info('Application successfully sent to Airtable', [
+                    'job_id' => $job->id,
+                    'applicant' => $request->vorname . ' ' . $request->name,
+                    'attachments_count' => count($attachments)
+                ]);
 
                 return redirect()->route('application.success', $job)
                     ->with('success', 'Ihre Bewerbung wurde erfolgreich übermittelt!');
@@ -138,13 +156,8 @@ class ApplicationController extends Controller
                 ]
             ]);
 
-            // Clean up temporary files on error
-            if (isset($lebenslaufPath)) {
-                Storage::disk('public')->delete($lebenslaufPath);
-            }
-            if (isset($anschreibenPath)) {
-                Storage::disk('public')->delete($anschreibenPath);
-            }
+            // Note: Files are kept for Airtable to download
+            // They can be cleaned up later via a scheduled task if needed
 
             // Show more specific error in development
             $errorMessage = 'Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.';
