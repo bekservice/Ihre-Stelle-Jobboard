@@ -1,0 +1,339 @@
+/* Ihre-Stelle Custom Styles */
+
+:root {
+    /* Ihre-Stelle Brand Colors - basierend auf dem Logo */
+    --primary-orange: #C4704A;
+    --primary-blue: #4A5568;
+    --primary-dark: #2D3748;
+    --accent-orange: #ED8936;
+    --accent-blue: #3182CE;
+    --light-gray: #F7FAFC;
+    --medium-gray: #E2E8F0;
+    --dark-gray: #4A5568;
+    --text-dark: #2D3748;
+    --text-light: #718096;
+}
+
+/* Override Tailwind colors with brand colors */
+.bg-primary-orange { background-color: var(--primary-orange); }
+.bg-primary-blue { background-color: var(--primary-blue); }
+.bg-accent-orange { background-color: var(--accent-orange); }
+.bg-accent-blue { background-color: var(--accent-blue); }
+
+.text-primary-orange { color: var(--primary-orange); }
+.text-primary-blue { color: var(--primary-blue); }
+.text-accent-orange { color: var(--accent-orange); }
+.text-accent-blue { color: var(--accent-blue); }
+
+.border-primary-orange { border-color: var(--primary-orange); }
+.border-primary-blue { border-color: var(--primary-blue); }
+
+/* Button Styles */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--accent-orange) 100%);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--accent-orange) 0%, var(--primary-orange) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(196, 112, 74, 0.3);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-blue) 100%);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, var(--accent-blue) 0%, var(--primary-blue) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 85, 104, 0.3);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--primary-blue);
+    border: 2px solid var(--primary-blue);
+    transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+    background: var(--primary-blue);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 85, 104, 0.3);
+}
+
+/* White outline button for dark backgrounds */
+.btn-outline-white {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-white:hover {
+    background: white;
+    color: var(--primary-blue);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+}
+
+/* Card Styles */
+.card-gradient {
+    background: linear-gradient(135deg, rgba(196, 112, 74, 0.05) 0%, rgba(74, 85, 104, 0.05) 100%);
+    border: 1px solid rgba(196, 112, 74, 0.1);
+}
+
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Styles */
+.form-input {
+    border: 2px solid var(--medium-gray);
+    border-radius: 8px;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+.form-input:focus {
+    border-color: var(--primary-orange);
+    box-shadow: 0 0 0 3px rgba(196, 112, 74, 0.1);
+    outline: none;
+}
+
+.form-label {
+    color: var(--text-dark);
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Navigation Styles */
+.nav-link {
+    color: var(--text-dark);
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: var(--primary-orange);
+}
+
+/* Hero Section */
+.hero-gradient {
+    background: linear-gradient(135deg, 
+        rgba(196, 112, 74, 0.1) 0%, 
+        rgba(74, 85, 104, 0.1) 50%, 
+        rgba(196, 112, 74, 0.05) 100%);
+}
+
+/* CTA Section */
+.cta-gradient {
+    background: linear-gradient(135deg, 
+        var(--primary-blue) 0%, 
+        var(--primary-dark) 50%, 
+        var(--primary-blue) 100%);
+}
+
+/* Job Card Styles */
+.job-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--medium-gray);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.job-card:hover {
+    border-color: var(--primary-orange);
+    box-shadow: 0 8px 25px rgba(196, 112, 74, 0.15);
+    transform: translateY(-2px);
+}
+
+.job-badge {
+    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--accent-orange) 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Search Form */
+.search-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+}
+
+.search-input {
+    border: 2px solid var(--medium-gray);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: var(--primary-orange);
+    box-shadow: 0 0 0 3px rgba(196, 112, 74, 0.1);
+}
+
+.search-button {
+    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--accent-orange) 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 16px 32px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background: linear-gradient(135deg, var(--accent-orange) 0%, var(--primary-orange) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(196, 112, 74, 0.3);
+}
+
+/* Application Form Styles */
+.application-form {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 32px;
+}
+
+.file-upload-area {
+    border: 2px dashed var(--medium-gray);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.file-upload-area:hover {
+    border-color: var(--primary-orange);
+    background-color: rgba(196, 112, 74, 0.02);
+}
+
+.file-upload-area.dragover {
+    border-color: var(--accent-orange);
+    background-color: rgba(196, 112, 74, 0.05);
+}
+
+/* Success/Error Messages */
+.alert-success {
+    background: linear-gradient(135deg, #48BB78 0%, #38A169 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}
+
+.alert-error {
+    background: linear-gradient(135deg, #F56565 0%, #E53E3E 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .search-container {
+        padding: 16px;
+        border-radius: 12px;
+    }
+    
+    .application-form {
+        padding: 20px;
+        border-radius: 12px;
+    }
+    
+    .search-input,
+    .search-button {
+        padding: 12px 16px;
+        border-radius: 8px;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-up {
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Map Styles */
+.mapbox-container {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.map-marker {
+    background: var(--primary-orange);
+    border: 3px solid white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 3px solid var(--medium-gray);
+    border-top: 3px solid var(--primary-orange);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+} 

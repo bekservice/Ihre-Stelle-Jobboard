@@ -7,11 +7,11 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
-class SyncAirtableJobs extends Command
+class SyncSingleJob extends Command
 {
-    protected $signature = 'airtable:sync';
+    protected $signature = 'airtable:sync-job {id : The Airtable record ID}';
 
-    protected $description = 'Sync jobs from Airtable';
+    protected $description = 'Sync a single job from Airtable by ID';
 
     private const BASE_URL = 'https://api.airtable.com/v0/appwdZ74k0TlXQf0Y/Jobs';
 
@@ -21,42 +21,41 @@ class SyncAirtableJobs extends Command
 
     public function handle(): void
     {
+        $airtableId = $this->argument('id');
+        
         $token = config('services.airtable.token');
         if (!$token) {
             $this->error('No Airtable token configured.');
             return;
         }
 
-        $this->info('Starting Airtable job sync...');
-        $totalRecords = 0;
-        $url = self::BASE_URL;
-        $params = [
-            'pageSize' => 100,
-        ];
+        $this->info("Syncing job with Airtable ID: {$airtableId}");
 
-        do {
-            $response = Http::withToken($token)->get($url, $params);
+        try {
+            // Fetch specific record from Airtable
+            $url = self::BASE_URL . '/' . $airtableId;
+            $response = Http::withToken($token)->get($url);
+
             if (!$response->ok()) {
-                $this->error('Request failed: '.$response->status());
+                $this->error('Failed to fetch record from Airtable: ' . $response->status());
                 return;
             }
 
-            $data = $response->json();
-            foreach ($data['records'] as $record) {
-                $this->importRecord($record);
-                $totalRecords++;
-            }
-            
-            $this->info("Processed {$totalRecords} records...");
-            
-            $url = self::BASE_URL;
-            $params['offset'] = $data['offset'] ?? null;
-        } while (!empty($params['offset']));
+            $record = $response->json();
+            $job = $this->importRecord($record);
 
-        $this->info("Sync completed! Total records processed: {$totalRecords}");
+            $this->info("✓ Job synchronized successfully:");
+            $this->line("  Title: {$job->title}");
+            $this->line("  Slug: {$job->slug}");
+            $this->line("  URL: https://ihre-stelle.de/jobs/{$job->slug}");
+            $this->line("  Active: " . ($job->is_active ? 'Yes' : 'No'));
+
+        } catch (\Exception $e) {
+            $this->error('Sync failed: ' . $e->getMessage());
+        }
     }
 
-    private function importRecord(array $record): void
+    private function importRecord(array $record): JobPost
     {
         $fields = $record['fields'] ?? [];
         $status = $fields['Status'] ?? null;
@@ -114,15 +113,11 @@ class SyncAirtableJobs extends Command
         }
 
         $post->save();
-        
+
         // Update Airtable with Ihre-Stelle URL
         $this->updateAirtableRecord($record['id'], $post);
-        
-        if ($post->wasRecentlyCreated) {
-            $this->line("✓ Created: {$post->title}");
-        } else {
-            $this->line("↻ Updated: {$post->title}");
-        }
+
+        return $post;
     }
 
     private function parseDate(?string $dateString): ?string
@@ -138,17 +133,15 @@ class SyncAirtableJobs extends Command
         }
     }
 
-    private function processAttachments(?array $attachments, bool $firstOnly = false): ?array
+    private function processAttachments(?array $attachments): ?array
     {
         if (!$attachments || !is_array($attachments)) {
             return null;
         }
         
         $processed = [];
-        $limit = $firstOnly ? 1 : count($attachments);
         
-        for ($i = 0; $i < min($limit, count($attachments)); $i++) {
-            $attachment = $attachments[$i];
+        foreach ($attachments as $attachment) {
             $processed[] = [
                 'id' => $attachment['id'] ?? null,
                 'url' => $attachment['url'] ?? null,
@@ -190,11 +183,13 @@ class SyncAirtableJobs extends Command
             $response = Http::withToken($token)
                 ->patch($url, $data);
 
-            if (!$response->ok()) {
+            if ($response->ok()) {
+                $this->line("✓ Updated Airtable record with URL: {$jobUrl}");
+            } else {
                 $this->warn("Failed to update Airtable record {$recordId}: " . $response->body());
             }
         } catch (\Exception $e) {
-            $this->warn("Error updating Airtable record {$recordId}: " . $e->getMessage());
+            $this->error("Error updating Airtable record {$recordId}: " . $e->getMessage());
         }
     }
-}
+} 
