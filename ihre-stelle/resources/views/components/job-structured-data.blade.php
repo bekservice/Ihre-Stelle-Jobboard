@@ -109,7 +109,7 @@
         $structuredData['applicationContact']['url'] = $job->bewerbungen_an_link;
     } else {
         // Fallback to our application form
-        $structuredData['applicationContact']['url'] = route('applications.form', $job->slug);
+        $structuredData['applicationContact']['url'] = route('application.show', $job->slug);
     }
 
     // Add special requirements or notes
