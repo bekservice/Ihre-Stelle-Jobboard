@@ -14,7 +14,10 @@ class SitemapController extends Controller
             ->latest('updated_at')
             ->get();
 
-        $content = view('sitemap.index', compact('jobs'))->render();
+        $employers = JobPost::getEmployersWithJobCounts();
+        $cities = JobPost::getCitiesWithJobCounts();
+
+        $content = view('sitemap.index', compact('jobs', 'employers', 'cities'))->render();
 
         return response($content, 200)
             ->header('Content-Type', 'text/xml');
@@ -28,6 +31,26 @@ class SitemapController extends Controller
             ->get();
 
         $content = view('sitemap.jobs', compact('jobs'))->render();
+
+        return response($content, 200)
+            ->header('Content-Type', 'text/xml');
+    }
+
+    public function employers()
+    {
+        $employers = JobPost::getEmployersWithJobCounts();
+
+        $content = view('sitemap.employers', compact('employers'))->render();
+
+        return response($content, 200)
+            ->header('Content-Type', 'text/xml');
+    }
+
+    public function cities()
+    {
+        $cities = JobPost::getCitiesWithJobCounts();
+
+        $content = view('sitemap.cities', compact('cities'))->render();
 
         return response($content, 200)
             ->header('Content-Type', 'text/xml');

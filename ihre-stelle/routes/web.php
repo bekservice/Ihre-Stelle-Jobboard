@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\EmployerController;
+use App\Http\Controllers\CityController;
 
 Route::get('/', [JobController::class, 'index'])->name('home');
 Route::get('/jobs/{job:slug}', [JobController::class, 'show'])->name('jobs.show');
@@ -33,9 +35,19 @@ Route::get('/jobs/{job:slug}/bewerbung-erfolgreich', [App\Http\Controllers\Appli
 // Webhook routes
 Route::post('/webhook/sync-job', [WebhookController::class, 'syncSingleJob'])->name('webhook.sync-job');
 
+// Employer landing pages
+Route::get('/arbeitgeber', [EmployerController::class, 'index'])->name('employers.index');
+Route::get('/arbeitgeber/{slug}', [EmployerController::class, 'show'])->name('employers.show');
+
+// City landing pages  
+Route::get('/staedte', [CityController::class, 'index'])->name('cities.index');
+Route::get('/jobs/{slug}', [CityController::class, 'show'])->name('cities.show');
+
 // Sitemap routes
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 Route::get('/sitemap-jobs.xml', [SitemapController::class, 'jobs']);
+Route::get('/sitemap-employers.xml', [SitemapController::class, 'employers']);
+Route::get('/sitemap-cities.xml', [SitemapController::class, 'cities']);
 
 // Robots.txt
 Route::get('/robots.txt', function () {
