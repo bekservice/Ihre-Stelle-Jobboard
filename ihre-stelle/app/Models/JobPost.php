@@ -324,6 +324,20 @@ class JobPost extends Model
             $location['address']['postalCode'] = $this->postal_code;
         }
 
+        // Add streetAddress with intelligent fallback strategy
+        $streetAddressResult = $this->getStreetAddressFallback();
+        if ($streetAddressResult) {
+            if (is_array($streetAddressResult)) {
+                $location['address']['streetAddress'] = $streetAddressResult['address'];
+                // Add debug comment for development
+                if (config('app.debug')) {
+                    $location['_debug_streetAddress_source'] = $streetAddressResult['source'];
+                }
+            } else {
+                $location['address']['streetAddress'] = $streetAddressResult;
+            }
+        }
+
         // Add coordinates if available
         if ($this->latitude && $this->longitude) {
             $location['geo'] = [
@@ -334,6 +348,129 @@ class JobPost extends Model
         }
 
         return $location;
+    }
+
+    /**
+     * Get street address with fallback strategy for Schema.org
+     */
+    private function getStreetAddressFallback()
+    {
+        // Strategy 1: Extract street address from job description
+        if ($this->description) {
+            $streetFromDescription = $this->extractStreetFromDescription();
+            if ($streetFromDescription) {
+                return config('app.debug') 
+                    ? ['address' => $streetFromDescription, 'source' => 'job_description']
+                    : $streetFromDescription;
+            }
+        }
+
+        // Strategy 2: Extract from "info_fuer_uns" field if it contains address information
+        if ($this->info_fuer_uns && is_string($this->info_fuer_uns) && !str_contains($this->info_fuer_uns, 'job-logos/')) {
+            $streetFromInfo = $this->extractStreetFromText($this->info_fuer_uns);
+            if ($streetFromInfo) {
+                return config('app.debug') 
+                    ? ['address' => $streetFromInfo, 'source' => 'info_fuer_uns']
+                    : $streetFromInfo;
+            }
+        }
+
+        // Strategy 3: Use company name as location identifier
+        if ($this->arbeitsgeber_name && $this->arbeitsgeber_name !== 'Vertraulich') {
+            $fallbackAddress = "bei {$this->arbeitsgeber_name}";
+            return config('app.debug') 
+                ? ['address' => $fallbackAddress, 'source' => 'company_name_fallback']
+                : $fallbackAddress;
+        }
+
+        // Strategy 4: Use city center as fallback (common for job postings)
+        if ($this->city) {
+            $fallbackAddress = "Stadtgebiet {$this->city}";
+            return config('app.debug') 
+                ? ['address' => $fallbackAddress, 'source' => 'city_fallback']
+                : $fallbackAddress;
+        }
+
+        // Strategy 5: Generic fallback
+        $fallbackAddress = "Arbeitsort vor Ort";
+        return config('app.debug') 
+            ? ['address' => $fallbackAddress, 'source' => 'generic_fallback']
+            : $fallbackAddress;
+    }
+
+    /**
+     * Extract street address from job description
+     */
+    private function extractStreetFromDescription(): ?string
+    {
+        return $this->extractStreetFromText($this->description);
+    }
+
+    /**
+     * Extract street address from any text content
+     */
+    private function extractStreetFromText(?string $text): ?string
+    {
+        if (!$text) {
+            return null;
+        }
+        
+        // Pattern 1: German street patterns (Straßenname + Hausnummer)
+        $patterns = [
+            // "Musterstraße 123" or "Musterstr. 123"
+            '/([A-ZÄÖÜ][a-zäöüß]+(?:straße|str\.?|weg|platz|gasse|allee|ring|damm)\s+\d+[a-zA-Z]?)/iu',
+            
+            // "Am Musterweg 5" or "An der Hauptstraße 10"
+            '/((?:Am|An\s+der?|Zur?|In\s+der?)\s+[A-ZÄÖÜ][a-zäöüß]+(?:straße|str\.?|weg|platz|gasse|allee|ring|damm)\s+\d+[a-zA-Z]?)/iu',
+            
+            // "Hauptstraße 15-17" (ranges)
+            '/([A-ZÄÖÜ][a-zäöüß]+(?:straße|str\.?|weg|platz|gasse|allee|ring|damm)\s+\d+[-–]\d+[a-zA-Z]?)/iu',
+            
+            // Simple patterns like "Adresse: Musterstraße 1"
+            '/(?:Adresse|Standort|Arbeitsort):\s*([A-ZÄÖÜ][a-zäöüß]+(?:straße|str\.?|weg|platz|gasse|allee|ring|damm)\s+\d+[a-zA-Z]?)/iu',
+            
+            // Patterns with shortened street names like "Pegnitzstr. 31"
+            '/([A-ZÄÖÜ][a-zäöüß]+str\.\s+\d+[a-zA-Z]?)/iu',
+            
+            // International patterns for address lines
+            '/(?:Adresse|Address|Standort|Arbeitsort):\s*([A-ZÄÖÜ][a-zäöüß\s]+\d+[a-zA-Z]?)/iu'
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $text, $matches)) {
+                $streetAddress = trim($matches[1]);
+                
+                // Validate that it's a reasonable street address
+                if (strlen($streetAddress) > 5 && strlen($streetAddress) < 100) {
+                    return $streetAddress;
+                }
+            }
+        }
+
+        // Pattern 2: Look for company address formats
+        if (preg_match('/(?:Adresse|Standort|Arbeitsort):\s*([^\n\r]+)/iu', $text, $matches)) {
+            $addressLine = trim($matches[1]);
+            
+            // Clean up and validate
+            $addressLine = preg_replace('/[,;]+.*$/', '', $addressLine); // Remove everything after comma/semicolon
+            $addressLine = trim($addressLine);
+            
+            if (strlen($addressLine) > 5 && strlen($addressLine) < 100 && 
+                !preg_match('/\b(?:Tel|Telefon|E-?Mail|Website|www)\b/i', $addressLine)) {
+                return $addressLine;
+            }
+        }
+
+        // Pattern 3: Direct address pattern like "Gewerbestr. 1" or "Kaufbeurer Str. 8"
+        if (preg_match('/\b([A-ZÄÖÜ][a-zäöüß]*(?:str|straße|weg|platz|gasse|allee|ring|damm)\.?\s+\d+[a-zA-Z]?)\b/iu', $text, $matches)) {
+            $streetAddress = trim($matches[1]);
+            
+            if (strlen($streetAddress) > 5 && strlen($streetAddress) < 100) {
+                return $streetAddress;
+            }
+        }
+
+        return null;
     }
 
     /**
